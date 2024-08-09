@@ -7,6 +7,9 @@ import random
 import time
 import threading
 from Crypto.Hash import RIPEMD160
+from Crypto.PublicKey import ECC
+from Crypto.Hash import SHA256
+from Crypto.Util import number
 from colorthon import Colors
 
 # Define color codes
@@ -20,7 +23,7 @@ RESET = Colors.RESET
 MAX_PRIVATE_KEY = 2**256 - 1  # Example maximum private key value
 
 def ripemd160_hash(data):
-    """Compute RIPEMD160 hash of the input data."""
+    """Compute RIPEMD-160 hash of the given data."""
     h = RIPEMD160.new()
     h.update(data)
     return h.digest()
@@ -42,26 +45,26 @@ def key_gen(size):
 
 def hex_to_addr(hexed, compress):
     """Convert a hexadecimal private key to an Ethereum address."""
-    # Placeholder for address conversion using your own implementation
-    # Example implementation using ripemd160_hash and other operations:
-    from Crypto.PublicKey import ECC
-    from Crypto.Hash import SHA256
-    from Crypto.Hash import RIPEMD160
-    from Crypto.Util import number
-
+    # Convert hex private key to integer
     priv_key = number.bytes_to_long(bytes.fromhex(hexed))
-    key = ECC.construct(d=priv_key)
-    pub_key = key.public_key().export_key(format='DER')[4:]
 
+    # Create ECC key object
+    key = ECC.construct(curve='P-256', d=priv_key)
+    pub_key = key.public_key().export_key(format='DER')[4:]  # Remove the first byte
+
+    # Perform SHA256 followed by RIPEMD160 hashing
     sha256_hash = SHA256.new(pub_key)
     ripemd160_hash = RIPEMD160.new()
     ripemd160_hash.update(sha256_hash.digest())
     addr = ripemd160_hash.digest()
+
+    # Return address based on compression choice
     if compress:
-        return addr.hex()
+        # Convert to Ethereum address (prepend with '0x' and pad to 40 hex chars)
+        return '0x' + addr.hex()[:40]
     else:
-        # Just return the hex for now
-        return addr.hex()
+        # Uncompressed address (not standard in Ethereum, but here for completeness)
+        return '0x' + addr.hex()
 
 def rich_loader(filename):
     """Load addresses from a file into a set."""
