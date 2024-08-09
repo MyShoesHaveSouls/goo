@@ -20,6 +20,7 @@ RESET = Colors.RESET
 MAX_PRIVATE_KEY = 2**256 - 1  # Example maximum private key value
 
 def ripemd160_hash(data):
+    """Compute RIPEMD160 hash of the input data."""
     h = RIPEMD160.new()
     h.update(data)
     return h.digest()
@@ -42,7 +43,25 @@ def key_gen(size):
 def hex_to_addr(hexed, compress):
     """Convert a hexadecimal private key to an Ethereum address."""
     # Placeholder for address conversion using your own implementation
-    pass
+    # Example implementation using ripemd160_hash and other operations:
+    from Crypto.PublicKey import ECC
+    from Crypto.Hash import SHA256
+    from Crypto.Hash import RIPEMD160
+    from Crypto.Util import number
+
+    priv_key = number.bytes_to_long(bytes.fromhex(hexed))
+    key = ECC.construct(d=priv_key)
+    pub_key = key.public_key().export_key(format='DER')[4:]
+
+    sha256_hash = SHA256.new(pub_key)
+    ripemd160_hash = RIPEMD160.new()
+    ripemd160_hash.update(sha256_hash.digest())
+    addr = ripemd160_hash.digest()
+    if compress:
+        return addr.hex()
+    else:
+        # Just return the hex for now
+        return addr.hex()
 
 def rich_loader(filename):
     """Load addresses from a file into a set."""
@@ -109,3 +128,9 @@ def main_check():
             print(f"Generated: {lg} (SHA-256 - HEX) ...")
         else:
             tm = time.strftime("%Y-%m-%d %H:%M:%S", lct)
+            print(f"[{tm}][Total: {z} Check: {z * 2}] #Found: {wf} ", end="\r")
+
+if __name__ == '__main__':
+    t = threading.Thread(target=main_check)
+    t.start()
+    t.join()
