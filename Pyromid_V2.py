@@ -1,18 +1,13 @@
 # Install cryptofuzz & colorthon
-# pip install cryptofuzz
-# pip install colorthon
 # pip install pycryptodome
+# pip install colorthon
 
 import os
 import random
 import time
 import threading
-from cryptofuzz import Convertor
-from cryptofuzz.assest import MAX_PRIVATE_KEY
+from Crypto.Hash import RIPEMD160
 from colorthon import Colors
-
-# Initialize Convertor instance
-co = Convertor()
 
 # Define color codes
 RED = Colors.RED
@@ -21,6 +16,13 @@ YELLOW = Colors.YELLOW
 CYAN = Colors.CYAN
 WHITE = Colors.WHITE
 RESET = Colors.RESET
+
+MAX_PRIVATE_KEY = 2**256 - 1  # Example maximum private key value
+
+def ripemd160_hash(data):
+    h = RIPEMD160.new()
+    h.update(data)
+    return h.digest()
 
 def get_clear():
     """Clear the terminal screen."""
@@ -39,7 +41,8 @@ def key_gen(size):
 
 def hex_to_addr(hexed, compress):
     """Convert a hexadecimal private key to an Ethereum address."""
-    return co.hex_to_addr(hexed, compress)
+    # Placeholder for address conversion using your own implementation
+    pass
 
 def rich_loader(filename):
     """Load addresses from a file into a set."""
@@ -59,7 +62,7 @@ def get_header(rich_file, loads, found):
 {RED}╔═╗╦═╗╔═╗╔═╗╦═╗╔═╗╔╦╗╔╦╗╔═╗╦═╗{RESET}  {WHITE}╔╦╗╔╦╗╔╦╗╦═╗╔═╗╔═╗ ╔═╗╔═╗╔╦╗{RESET}
 {RED}╠═╝╠╦╝║ ║║ ╦╠╦╝╠═╣║║║║║║║╣ ╠╦╝{RESET}  {WHITE}║║║║║║ ║║╠╦╝╔═╝╠═╣ ║  ║ ║║║║{RESET}
 {RED}╩  ╩╚═╚═╝╚═╝╩╚═╩ ╩╩ ╩╩ ╩╚═╝╩╚═{RESET}  {WHITE}╩ ╩╩ ╩═╩╝╩╚═╚═╝╩ ╩o╚═╝╚═╝╩ ╩{RESET}
-{RED}➜{RESET} {WHITE}BOOMBOX {RESET}{CYAN}v2 {RESET}Ⓟ{GREEN} Powered By Big Dicks- Exclusive pussy.COM{RESET}
+{RED}➜{RESET} {WHITE}BOOMBOX {RESET}{CYAN}v2 {RESET}Ⓟ{GREEN} Powered By CryptoFuzz - Exclusive MMDRZA.COM{RESET}
 {RED}▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬{RESET}
 {RED}[{RESET}{WHITE}►{RESET}{RED}]{RESET}{GREEN} Import Rich File :{RESET}{CYAN} {rich_file}                {RESET}
 {RED}[{RESET}{WHITE}►{RESET}{RED}]{RESET}{GREEN} Method Generated :{RESET}{CYAN} Random Without Repeat.    {RESET}
@@ -106,10 +109,3 @@ def main_check():
             print(f"Generated: {lg} (SHA-256 - HEX) ...")
         else:
             tm = time.strftime("%Y-%m-%d %H:%M:%S", lct)
-            print(f"[{tm}][Total: {z} Check: {z * 2}] #Found: {wf} ", end="\r")
-
-if __name__ == '__main__':
-    # Run MainCheck in a separate thread
-    t = threading.Thread(target=main_check)
-    t.start()
-    t.join()
